@@ -15,3 +15,6 @@ void yii_update_class_property(zval *object, const char *property_name, zval *va
 void yii_read_class_property(zval *object, const char *property_name, zval **retval);
 
 
+int yii_find_scope(zend_class_entry *ce, char *method_name TSRMLS_DC);
+
+

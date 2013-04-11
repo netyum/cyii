@@ -5,7 +5,7 @@
 #include "php.h"
 #include "php_ini.h" /* for zend_alter_ini_entry */
 #include "Zend/zend_interfaces.h" /* for zend_call_method_with_* */
-
+#include "ext/standard/php_var.h"
 #include "php_yii.h"
 
 
@@ -136,16 +136,36 @@ int yii_call_class_method(zval *object, char *method_name, zval **retval_ptr_ptr
 }
 
 int yii_call_class_method_0(zval *object, char *method_name, zval **retval) {
+	zend_class_entry *ce;
+	zval *func_name;
+	
+	/* Find class_entry scope */
+	ce = Z_OBJCE_P(object);
+	if (ce->parent) {
+		yii_find_scope(ce, method_name TSRMLS_CC);
+	} else {
+		EG(scope) = ce;
+	}
+
+	YII_NEW_STRING(func_name, method_name);
+
+	if (call_user_function_ex(&ce->function_table, &object, func_name, retval, 0, NULL, 0, NULL TSRMLS_CC) == FAILURE) {
+		return FAILURE;
+	}
+	
+	//php_printf("fail\n");
+	YII_PTR_DTOR(func_name);
+
 	//if (yii_call_class_method(object, method_name, retval, 0, NULL) == FAILURE) {
 	//	return FAILURE;
 	//}
-	TSRMLS_FETCH();
-	zend_class_entry *ce;
+	//TSRMLS_FETCH();
+	//zend_class_entry *ce;
 	
-	ce = Z_OBJCE_P(object);
-	EG(scope) = ce;
-	
-	zend_call_method(&object, ce, NULL, YII_SL(method_name), retval, 0, NULL, NULL TSRMLS_CC);
+	//ce = Z_OBJCE_P(object);
+	//EG(scope) = ce;
+	//zend_call_method_with_0_params(&object, Z_OBJCE_P(object), NULL, method_name, retval);
+	//zend_call_method(&object, ce, NULL, YII_SL(method_name), retval, 0, NULL, NULL TSRMLS_CC);
 	return SUCCESS;
 }
 
@@ -168,4 +188,25 @@ void yii_read_class_property(zval *object, const char *property_name, zval **ret
 	//EG(scope) = ce;
 	
 	*retval = zend_read_property(ce, object, property_name, strlen(property_name), 1 TSRMLS_CC);
+}
+
+int yii_find_scope(zend_class_entry *ce, char *method_name TSRMLS_DC){
+
+	char *lcname = zend_str_tolower_dup(method_name, strlen(method_name));
+	unsigned long hash = zend_inline_hash_func(lcname, strlen(method_name)+1);
+
+	while (ce) {
+		if (zend_hash_quick_exists(&ce->function_table, lcname, strlen(method_name)+1, hash)) {
+			EG(scope) = ce;
+			efree(lcname);
+			return SUCCESS;
+		}
+		ce = ce->parent;
+	}
+
+	if (lcname) {
+		efree(lcname);
+	}
+
+	return FAILURE;
 }
