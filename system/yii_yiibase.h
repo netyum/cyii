@@ -1,0 +1,3 @@
+YII_CLASS_DECLARE_ENTRY_EX(yiibase);
+
+YII_CLASS_FUNCTION(yiibase);

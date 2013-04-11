@@ -1,0 +1,3 @@
+YII_CLASS_DECLARE_ENTRY_EX(istatepersister);
+
+YII_CLASS_FUNCTION(istatepersister);

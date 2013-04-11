@@ -1,0 +1,3 @@
+YII_CLASS_DECLARE_ENTRY_EX(iwebserviceprovider);
+
+YII_CLASS_FUNCTION(iwebserviceprovider);

@@ -1,0 +1,3 @@
+YII_CLASS_DECLARE_ENTRY_EX(iwidgetfactory);
+
+YII_CLASS_FUNCTION(iwidgetfactory);
