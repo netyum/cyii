@@ -26,6 +26,7 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "ext/standard/php_var.h"
+#include "ext/spl/spl_iterators.h"
 #include "php_yii.h"
 #include "func.h"
 
@@ -48,6 +49,11 @@
 
 /* base class */
 #include "system/base/yii_ccomponent.h"
+#include "system/base/yii_cevent.h"
+
+/* collections class */
+#include "system/collections/yii_clist.h"
+#include "system/collections/yii_clistiterator.h"
 
 #include "system/yii_yiibase.h"
 
@@ -127,7 +133,11 @@ PHP_MINIT_FUNCTION(yii)
 	/* base class */
 	
 	YII_CLASS(ccomponent);
+	YII_CLASS(cevent);
 	
+	/* collections class */
+	YII_CLASS(clist);
+	YII_CLASS(clistiterator);
 	
 	
 	

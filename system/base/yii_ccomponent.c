@@ -182,7 +182,7 @@ PHP_METHOD(CComponent, __get){
 			php_var_dump(&e_zv, 1);
 			php_printf("xxxxxxxxx\n");
 			zval *e_name_zv;
-			if (zend_symtable_find(Z_ARRVAL_P(e_zv),  Z_STRVAL_P(name_zv), Z_STRLEN_P(name_zv), (void **) &e_name_zv) ) {
+			if (zend_symtable_find(Z_ARRVAL_P(e_zv),  Z_STRVAL_P(name_zv), Z_STRLEN_P(name_zv)+1, (void **) &e_name_zv) ) {
 				//convert_to_object(e_name_zv);
 				//convert_to_long(e_name_zv);
 				//php_printf("this    onononono\n");
@@ -530,8 +530,8 @@ YII_CLASS_FUNCTION(ccomponent) {
 	//AUTO CALL CLASS METHOD
 	YII_CLASS_DECLARE(CComponent, ccomponent, 0);
 	
-	zend_declare_property_null(YII_CLASS_ENTRY(ccomponent), YII_SL("_e"), ZEND_ACC_PRIVATE|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_null(YII_CLASS_ENTRY(ccomponent), YII_SL("_m"), ZEND_ACC_PRIVATE|ZEND_ACC_STATIC TSRMLS_CC);
+	zend_declare_property_null(YII_CLASS_ENTRY(ccomponent), YII_SL("_e"), ZEND_ACC_PRIVATE TSRMLS_CC);
+	zend_declare_property_null(YII_CLASS_ENTRY(ccomponent), YII_SL("_m"), ZEND_ACC_PRIVATE TSRMLS_CC);
 	return SUCCESS;
 }
 /* }}} */

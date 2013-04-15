@@ -7,9 +7,12 @@
 #include "Zend/zend_interfaces.h" /* for zend_call_method_with_* */
 #include "ext/standard/php_var.h"
 #include "php_yii.h"
-
-
 #include "func.h"
+
+
+void yii_inherit_not_found(char *class_name, char *inherit_name) {
+	fprintf(stderr, "Error: Class to extend '%s' was not found when registering class '%s'\n", class_name, inherit_name);
+}
 
 void yii_concat(zval **left, zval *right TSRMLS_DC){
 
@@ -77,6 +80,14 @@ int yii_call_user_fun_0(const char *func_name, zval **retval) {
 	return SUCCESS;
 }
 
+int yii_call_user_fun_0_no(const char *func_name) {
+	zval *retval;
+	int status;
+	status = yii_call_user_fun(func_name, &retval, 0, NULL);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
 int yii_call_user_fun_1(const char *func_name, zval **retval, zval *param) {
 	zval **params[1];
 	params[0] = &param;
@@ -87,10 +98,18 @@ int yii_call_user_fun_1(const char *func_name, zval **retval, zval *param) {
 	return SUCCESS;
 }
 
+int yii_call_user_fun_1_no(const char *func_name, zval *param) {
+	zval **params[1], *retval;
+	int status;
+	params[0] = &param;
+	status = yii_call_user_fun(func_name, &retval, 1, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
 int yii_call_user_fun_2(const char *func_name, zval **retval, zval *param1, zval *param2) {
 	zval **params[2];
-	params[0] = &param1;
-	params[1] = &param2;
+	params[0] = &param1; params[1] = &param2;
 	
 	if (yii_call_user_fun(func_name, retval, 2, params) == FAILURE) {
 		return FAILURE;
@@ -98,11 +117,18 @@ int yii_call_user_fun_2(const char *func_name, zval **retval, zval *param1, zval
 	return SUCCESS;
 }
 
+int yii_call_user_fun_2_no(const char *func_name, zval *param1, zval *param2) {
+	zval **params[2], *retval;
+	int status;
+	params[0] = &param1; params[1] = &param2;
+	status = yii_call_user_fun(func_name, &retval, 2, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
 int yii_call_user_fun_3(const char *func_name, zval **retval, zval *param1, zval *param2, zval *param3) {
 	zval **params[3];
-	params[0] = &param1;
-	params[1] = &param2;
-	params[2] = &param3;
+	params[0] = &param1; params[1] = &param2; params[2] = &param3;
 	
 	if (yii_call_user_fun(func_name, retval, 3, params) == FAILURE) {
 		return FAILURE;
@@ -110,6 +136,52 @@ int yii_call_user_fun_3(const char *func_name, zval **retval, zval *param1, zval
 	return SUCCESS;
 }
 
+int yii_call_user_fun_3_no(const char *func_name, zval *param1, zval *param2, zval *param3) {
+	zval **params[3], *retval;
+	int status;
+	params[0] = &param1; params[1] = &param2; params[2] = &param3;
+	status = yii_call_user_fun(func_name, &retval, 3, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
+int yii_call_user_fun_4(const char *func_name, zval **retval, zval *param1, zval *param2, zval *param3, zval *param4) {
+	zval **params[4];
+	params[0] = &param1; params[1] = &param2; params[2] = &param3; params[3] = &param4;
+	
+	if (yii_call_user_fun(func_name, retval, 4, params) == FAILURE) {
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+
+int yii_call_user_fun_4_no(const char *func_name, zval *param1, zval *param2, zval *param3, zval *param4) {
+	zval **params[4], *retval;
+	int status;
+	params[0] = &param1; params[1] = &param2; params[2] = &param3; params[3] = &param4;
+	status = yii_call_user_fun(func_name, &retval, 4, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
+int yii_call_user_fun_5(const char *func_name, zval **retval, zval *param1, zval *param2, zval *param3, zval *param4, zval *param5) {
+	zval **params[5];
+	params[0] = &param1; params[1] = &param2; params[2] = &param3; params[3] = &param4; params[4] = &param5;
+	
+	if (yii_call_user_fun(func_name, retval, 5, params) == FAILURE) {
+		return FAILURE;
+	}
+	return SUCCESS;
+}
+
+int yii_call_user_fun_5_no(const char *func_name, zval *param1, zval *param2, zval *param3, zval *param4, zval *param5) {
+	zval **params[5], *retval;
+	int status;
+	params[0] = &param1; params[1] = &param2; params[2] = &param3; params[3] = &param4; params[4] = &param5;
+	status = yii_call_user_fun(func_name, &retval, 5, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
 
 int yii_call_class_method(zval *object, char *method_name, zval **retval_ptr_ptr, zend_uint param_count, zval **params[]) {
 	TSRMLS_FETCH();
@@ -123,71 +195,71 @@ int yii_call_class_method(zval *object, char *method_name, zval **retval_ptr_ptr
 		return FAILURE;
 	}
 
-	
-	ce = Z_OBJCE_P(object);
-	EG(scope) = ce;
-	
-	if (call_user_function_ex(&ce->function_table, &object, func_name, NULL, param_count, params, 0, NULL TSRMLS_CC) == FAILURE) {
-		return FAILURE;
-	}
-	
-	YII_PTR_DTOR(func_name);
-	return SUCCESS;
-}
-
-int yii_call_class_method_0(zval *object, char *method_name, zval **retval) {
-	zend_class_entry *ce;
-	zval *func_name;
-	
-	/* Find class_entry scope */
 	ce = Z_OBJCE_P(object);
 	if (ce->parent) {
 		yii_find_scope(ce, method_name TSRMLS_CC);
 	} else {
 		EG(scope) = ce;
 	}
-
-	YII_NEW_STRING(func_name, method_name);
-
-	if (call_user_function_ex(&ce->function_table, &object, func_name, retval, 0, NULL, 0, NULL TSRMLS_CC) == FAILURE) {
+	
+	if (call_user_function_ex(&ce->function_table, &object, func_name, retval_ptr_ptr, param_count, params, 0, NULL TSRMLS_CC) == FAILURE) {
 		return FAILURE;
 	}
 	
-	//php_printf("fail\n");
 	YII_PTR_DTOR(func_name);
-
-	//if (yii_call_class_method(object, method_name, retval, 0, NULL) == FAILURE) {
-	//	return FAILURE;
-	//}
-	//TSRMLS_FETCH();
-	//zend_class_entry *ce;
-	
-	//ce = Z_OBJCE_P(object);
-	//EG(scope) = ce;
-	//zend_call_method_with_0_params(&object, Z_OBJCE_P(object), NULL, method_name, retval);
-	//zend_call_method(&object, ce, NULL, YII_SL(method_name), retval, 0, NULL, NULL TSRMLS_CC);
 	return SUCCESS;
 }
 
-/*
-void yii_update_class_property(zval *object, const char *property_name, zval *value) {
-	TSRMLS_FETCH();
-	zend_class_entry *ce;
-	
-	ce = Z_OBJCE_P(object);
-	EG(scope) = ce;
-	
-	zend_update_property(ce, object, property_name, strlen(property_name), value TSRMLS_CC);
-}*/
+int yii_call_class_method_no(zval *object, char *method_name, zend_uint param_count, zval **params[]) {
+	zval *retval;
+	int status;
+	status = yii_call_class_method(object, method_name, &retval, param_count, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
 
-void yii_read_class_property(zval *object, const char *property_name, zval **retval) {
-	TSRMLS_FETCH();
-	zend_class_entry *ce;
-	
-	ce = Z_OBJCE_P(object);
-	//EG(scope) = ce;
-	
-	*retval = zend_read_property(ce, object, property_name, strlen(property_name), 1 TSRMLS_CC);
+int yii_call_class_method_0(zval *object, char *method_name, zval **retval) {
+	return yii_call_class_method(object, method_name, retval, 0, NULL);
+}
+
+int yii_call_class_method_0_no(zval *object, char *method_name) {
+	zval *retval;
+	int status;
+	status = yii_call_class_method(object, method_name, &retval, 0, NULL);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
+int yii_call_class_method_1(zval *object, char *method_name, zval **retval, zval *param) {
+	zval **params[1];
+	params[0] = &param;
+	return yii_call_class_method(object, method_name, retval, 1, params);
+}
+
+int yii_call_class_method_1_no(zval *object, char *method_name, zval *param) {
+	zval **params[1], *retval;
+	params[0] = &param;
+	int status;
+	status = yii_call_class_method(object, method_name, &retval, 1, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
+int yii_call_class_method_2(zval *object, char *method_name, zval **retval, zval *param1, zval *param2) {
+	zval **params[2];
+	params[0] = &param1;
+	params[1] = &param2;
+	return yii_call_class_method(object, method_name, retval, 2, params);
+}
+
+int yii_call_class_method_2_no(zval *object, char *method_name, zval *param1, zval *param2) {
+	zval **params[2], *retval;
+	params[0] = &param1;
+	params[1] = &param2;
+	int status;
+	status = yii_call_class_method(object, method_name, &retval, 2, params);
+	YII_PTR_DTOR(retval);
+	return status;
 }
 
 int yii_find_scope(zend_class_entry *ce, char *method_name TSRMLS_DC){
@@ -209,4 +281,47 @@ int yii_find_scope(zend_class_entry *ce, char *method_name TSRMLS_DC){
 	}
 
 	return FAILURE;
+}
+
+int yii_class_has_constructor(zval *object TSRMLS_DC){
+
+	zend_class_entry *ce = Z_OBJCE_P(object);
+
+	while (ce) {
+		if (ce->constructor) {
+			return 1;
+		}
+		ce = ce->parent;
+	}
+
+	return 0;
+}
+
+int yii_new_class_instance(zval **return_value, char *class_name, zend_uint param_count, zval **params[] TSRMLS_DC){
+	zend_class_entry *ce;
+	ce = zend_fetch_class(class_name, strlen(class_name), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	if (!ce) {
+		return FAILURE;
+	}
+
+	ALLOC_INIT_ZVAL(*return_value);
+	object_init_ex(*return_value, ce);
+	if (yii_class_has_constructor(*return_value TSRMLS_CC)) {
+		if (yii_call_class_method_no(*return_value, "__construct" , param_count, params) == FAILURE) {
+			YII_PTR_DTOR(*return_value);
+			return FAILURE;
+		}
+	}
+	return SUCCESS;
+}
+
+int yii_new_class_instance_0(zval **return_value, char *class_name TSRMLS_DC) {
+	return yii_new_class_instance(return_value, class_name, 0, NULL);
+}
+
+int yii_new_class_instance_1(zval **return_value, char *class_name, zval *param TSRMLS_DC) {
+	zval **params[1];
+	params[0] = &param;
+	return yii_new_class_instance(return_value, class_name, 1, params);
+
 }

@@ -24,6 +24,11 @@ if test "$PHP_YII" = "yes"; then
 	system/base/interface/yii_iwidgetfactory.c \
 	\
 	system/base/yii_ccomponent.c \
+	system/base/yii_cevent.c \
+	\
+	system/collections/yii_clist.c \
+	system/collections/yii_clistiterator.c \
+	\
 	system/yii_yiibase.c,            
   $ext_shared)
 fi

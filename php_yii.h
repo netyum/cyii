@@ -65,11 +65,11 @@ extern zend_module_entry yii_module_entry;
 		yii_ ##name## _ce->ce_flags |= flags;  \
 	}
 
-#define YII_CLASS_DECLARE_EX(class_name, name, parent, flags) \
+#define YII_CLASS_DECLARE_EX(class_name, name, parent_name, parent, flags) \
 	{ \
 		zend_class_entry ce; \
 		INIT_CLASS_ENTRY(ce, #class_name, yii_ ##name## _method_entry); \
-		yii_ ##name## _ce = zend_register_internal_class_ex(&ce, NULL, parent TSRMLS_CC); \
+		yii_ ##name## _ce = zend_register_internal_class_ex(&ce, parent_name, parent TSRMLS_CC); \
 		if (!yii_ ##name## _ce) { \
 			yii_inherit_not_found(parent, #class_name); \
 			return FAILURE;	\
@@ -85,7 +85,7 @@ extern zend_module_entry yii_module_entry;
 		yii_ ##name## _ce->ce_flags |= flags;  \
 	}
 
-#define YII_NS_CLASS_DECLARE_EX(ns, class_name, name, parent, flags) \
+#define YII_NS_CLASS_DECLARE_EX(ns, class_name, name, parent_name, parent, flags) \
 	{ \
 		zend_class_entry ce; \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, yii_ ##name## _method_entry); \
@@ -144,10 +144,42 @@ extern zend_module_entry yii_module_entry;
 #define YII_NEW_LONG(zv, l) \
 	MAKE_STD_ZVAL(zv); \
 	ZVAL_LONG(zv, l);
+	
+#define YII_NEW_BOOL(zv, l) \
+	MAKE_STD_ZVAL(zv); \
+	ZVAL_BOOL(zv, l);
+	
+#define YII_NEW_NULL(zv) \
+	MAKE_STD_ZVAL(zv); \
+	ZVAL_NULL(zv);
 
 #define YII_NEW_ARRAY(arr_name) \
 	ALLOC_INIT_ZVAL(arr_name); \
 	array_init(arr_name);
+	
+#define YII_ADD_ARRAY(arr_name, index, item) \
+	switch(Z_TYPE_P(item)) { \
+		case IS_ARRAY: case IS_OBJECT: \
+			add_index_zval(arr_name, index, item); \
+			break; \
+		case IS_BOOL: \
+			add_index_bool(arr_name, index, Z_BVAL_P(item)); \
+			break; \
+		case IS_STRING: \
+			add_index_stringl(arr_name, index, Z_STRVAL_P(item), Z_STRLEN_P(item), 1); \
+			break; \
+		case IS_LONG: \
+			add_index_long(arr_name, index, Z_LVAL_P(item)); \
+			break; \
+		case IS_DOUBLE: \
+			add_index_double(arr_name, index, Z_DVAL_P(item)); \
+			break; \
+		case IS_RESOURCE: \
+			add_index_resource(arr_name, index, Z_RESVAL_P(item)); \
+			break; \
+		default: \
+			add_index_null(arr_name, index); \
+	}
 
 #define YII_DTOR(z) \
 	if (&z) {	\
