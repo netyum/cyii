@@ -150,7 +150,6 @@ PHP_METHOD(CList, getIterator){
 	zval *retval, *d_zv;
 	d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
 	if (yii_new_class_instance_1(&retval, "CListIterator", d_zv) == SUCCESS) {
-		php_printf("this ok\n");
 		RETVAL_ZVAL(retval, 1, 0);
 		YII_PTR_DTOR(retval);
 		return;
@@ -195,12 +194,9 @@ PHP_METHOD(CList, itemAt){
 	d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
 
 	/* if(isset($this->_d[$index])) */
-	if ( zend_hash_index_exists(Z_ARRVAL_P(d_zv), index) )
-	{
-		if (zend_hash_index_find(Z_ARRVAL_P(d_zv), index, (void **)&find_zv) == SUCCESS) {
-			RETVAL_ZVAL(*find_zv, 1, 0);
-			return;
-		}
+	if (zend_hash_index_find(Z_ARRVAL_P(d_zv), index, (void **)&find_zv) == SUCCESS) {
+		RETVAL_ZVAL(*find_zv, 1, 0);
+		return;
 	}
 	else if(index>=0 && index<Z_LVAL_P(c_zv)) { // in case the value is null
 		RETURN_NULL();
