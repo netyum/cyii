@@ -105,7 +105,7 @@ YII_CLASS_METHODS(clistiterator) {
 };
 /* }}} */
 
-/** {{{ Class CList
+/** {{{ Class CListIterator
 */
 YII_CLASS_FUNCTION(clistiterator) {
 	//AUTO CALL CLASS METHOD

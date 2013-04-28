@@ -54,6 +54,10 @@
 /* collections class */
 #include "system/collections/yii_clist.h"
 #include "system/collections/yii_clistiterator.h"
+#include "system/collections/yii_cstackiterator.h"
+#include "system/collections/yii_cmap.h"
+#include "system/collections/yii_cmapiterator.h"
+#include "system/collections/yii_cqueueiterator.h"
 
 #include "system/yii_yiibase.h"
 
@@ -138,11 +142,10 @@ PHP_MINIT_FUNCTION(yii)
 	/* collections class */
 	YII_CLASS(clist);
 	YII_CLASS(clistiterator);
-	
-	
-	
-	
-	
+	YII_CLASS(cstackiterator);
+	YII_CLASS(cmap);
+	YII_CLASS(cmapiterator);
+	YII_CLASS(cqueueiterator);
 	
 	/*  class */
 	YII_CLASS(yiibase);

@@ -165,9 +165,6 @@ extern zend_module_entry yii_module_entry;
 		case IS_BOOL: \
 			add_index_bool(arr_name, index, Z_BVAL_P(item)); \
 			break; \
-		case IS_STRING: \
-			add_index_stringl(arr_name, index, Z_STRVAL_P(item), Z_STRLEN_P(item), 1); \
-			break; \
 		case IS_LONG: \
 			add_index_long(arr_name, index, Z_LVAL_P(item)); \
 			break; \
@@ -177,8 +174,59 @@ extern zend_module_entry yii_module_entry;
 		case IS_RESOURCE: \
 			add_index_resource(arr_name, index, Z_RESVAL_P(item)); \
 			break; \
+		case IS_STRING: \
+			add_index_stringl(arr_name, index, Z_STRVAL_P(item), Z_STRLEN_P(item), 1); \
+			break; \
 		default: \
 			add_index_null(arr_name, index); \
+	}
+	
+#define YII_ADD_NEXT_ARRAY(arr_name, item) \
+	switch(Z_TYPE_P(item)) { \
+		case IS_ARRAY: case IS_OBJECT: \
+			add_next_index_zval(arr_name, item); \
+			break; \
+		case IS_BOOL: \
+			add_next_index_bool(arr_name, Z_BVAL_P(item)); \
+			break; \
+		case IS_LONG: \
+			add_next_index_long(arr_name, Z_LVAL_P(item)); \
+			break; \
+		case IS_DOUBLE: \
+			add_next_index_double(arr_name, Z_DVAL_P(item)); \
+			break; \
+		case IS_RESOURCE: \
+			add_next_index_resource(arr_name, Z_RESVAL_P(item)); \
+			break; \
+		case IS_STRING: \
+			add_next_index_stringl(arr_name, Z_STRVAL_P(item), Z_STRLEN_P(item), 1); \
+			break; \
+		default: \
+			add_next_index_null(arr_name); \
+	}
+	
+#define YII_ADD_ARRAY_EX(arr_name, key, item) \
+	switch(Z_TYPE_P(item)) { \
+		case IS_ARRAY: case IS_OBJECT: \
+			add_assoc_zval(arr_name, key, item); \
+			break; \
+		case IS_BOOL: \
+			add_assoc_bool(arr_name, key, Z_BVAL_P(item)); \
+			break; \
+		case IS_LONG: \
+			add_assoc_long(arr_name, key, Z_LVAL_P(item)); \
+			break; \
+		case IS_DOUBLE: \
+			add_assoc_double(arr_name, key, Z_DVAL_P(item)); \
+			break; \
+		case IS_RESOURCE: \
+			add_assoc_resource(arr_name, key, Z_RESVAL_P(item)); \
+			break; \
+		case IS_STRING: \
+			add_assoc_stringl(arr_name, key, Z_STRVAL_P(item), Z_STRLEN_P(item), 1); \
+			break; \
+		default: \
+			add_assoc_null(arr_name, key); \
 	}
 
 #define YII_DTOR(z) \

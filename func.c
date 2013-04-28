@@ -60,6 +60,91 @@ void yii_concat(zval **left, zval *right TSRMLS_DC){
 	}
 }
 
+int yii_call_class_static_method(zval *object, char *class_name, char *method_name, zval **retval_ptr_ptr, zend_uint param_count, zval **params[]) {
+	
+	zval *method_name_zv, *class_name_zv, *fn;
+	int status = FAILURE;
+	zend_class_entry *ce, *active_scope = NULL;
+
+
+	/*if (Z_TYPE_P(object) != IS_OBJECT) {
+		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Call to method %s() on a non object", method_name);
+		return FAILURE;
+	}*/
+
+	if (object) {
+		active_scope = EG(scope);
+		ce = Z_OBJCE_P(object);
+		if (ce->parent) {
+			yii_find_scope(ce, method_name TSRMLS_CC);
+		}
+	}
+
+	ALLOC_INIT_ZVAL(fn);
+	array_init_size(fn, 2);
+
+	YII_NEW_STRING(class_name_zv, class_name);
+	add_next_index_zval(fn, class_name_zv);
+	YII_NEW_STRING(method_name_zv, method_name);
+	add_next_index_zval(fn, method_name_zv);
+	status = call_user_function_ex(CG(function_table), NULL, fn, retval_ptr_ptr, param_count, params, 1, NULL TSRMLS_CC);
+
+	if (object) {
+		EG(scope) = active_scope;
+	}
+	
+	YII_PTR_DTOR(method_name_zv);
+	YII_PTR_DTOR(class_name_zv);
+	YII_PTR_DTOR(fn);
+	return status;
+}
+
+int yii_call_class_static_method_0(zval *object, char *class_name, char *method_name, zval **retval) {
+	return yii_call_class_static_method(object, class_name, method_name, retval, 0, NULL);
+}
+
+int yii_call_class_static_method_0_no(zval *object, char *class_name, char *method_name) {
+	zval *retval;
+	int status;
+	status = yii_call_class_static_method(object, class_name, method_name, &retval, 0, NULL);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
+int yii_call_class_static_method_1(zval *object, char *class_name, char *method_name, zval **retval, zval *param) {
+	zval **params[1];
+	params[0] = &param;
+	return yii_call_class_static_method(object, class_name, method_name, retval, 1, params);
+}
+
+int yii_call_class_static_method_1_no(zval *object, char *class_name, char *method_name, zval *param) {
+	zval *retval;
+	int status;
+	zval **params[1];
+	params[0] = &param;
+	status = yii_call_class_static_method(object, class_name, method_name, &retval, 1, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
+int yii_call_class_static_method_2(zval *object, char *class_name, char *method_name, zval **retval, zval *param1, zval *param2) {
+	zval **params[2];
+	params[0] = &param1;
+	params[1] = &param2;
+	return yii_call_class_static_method(object, class_name, method_name, retval, 2, params);
+}
+
+int yii_call_class_static_method_2_no(zval *object, char *class_name, char *method_name, zval *param1, zval *param2) {
+	zval *retval;
+	int status;
+	zval **params[2];
+	params[0] = &param1;
+	params[1] = &param2;
+	status = yii_call_class_static_method(object, class_name, method_name, &retval, 2, params);
+	YII_PTR_DTOR(retval);
+	return status;
+}
+
 
 int yii_call_user_fun(const char *function_name, zval **retval_ptr_ptr, zend_uint param_count, zval **params[]) {
 	TSRMLS_FETCH();

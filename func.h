@@ -32,6 +32,15 @@ int yii_new_class_instance(zval **return_value, char *class_name, zend_uint para
 int yii_new_class_instance_0(zval **return_value, char *class_name TSRMLS_DC);
 int yii_new_class_instance_1(zval **return_value, char *class_name, zval *param TSRMLS_DC);
 
+/* call call static method */
+int yii_call_class_static_method(zval *object, char *class_name, char *method_name, zval **retval_ptr_ptr, zend_uint param_count, zval **params[]);
 int yii_find_scope(zend_class_entry *ce, char *method_name TSRMLS_DC);
+
+int yii_call_class_static_method_0(zval *object, char *class_name, char *method_name, zval **retval);
+int yii_call_class_static_method_0_no(zval *object, char *class_name, char *method_name);
+int yii_call_class_static_method_1(zval *object, char *class_name, char *method_name, zval **retval, zval *param);
+int yii_call_class_static_method_1_no(zval *object, char *class_name, char *method_name, zval *param);
+int yii_call_class_static_method_2(zval *object, char *class_name, char *method_name, zval **retval, zval *param1, zval *param2);
+int yii_call_class_static_method_2_no(zval *object, char *class_name, char *method_name, zval *param1, zval *param2);
 
 

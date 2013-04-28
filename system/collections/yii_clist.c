@@ -108,14 +108,11 @@ PHP_METHOD(CList, __construct){
 	}
 
 	if (Z_TYPE_P(data_zv) != IS_NULL) {
-		php_printf("call copyFrom(data)\n");
 		if (yii_call_class_method_1_no(getThis(), "copyFrom", data_zv) != SUCCESS) {
-			php_printf("call copyFrom(data) fail\n");
 			return;
 		}
 	}
 	
-	php_printf("call setReadOnly(readOnly)\n");
 	YII_PTR_DTOR(data_zv);
 	YII_PTR_DTOR(readOnly_zv);
 	
@@ -210,8 +207,7 @@ PHP_METHOD(CList, itemAt){
 /** {{{ public CList::add()
 */
 PHP_METHOD(CList, add){
-	zval *item_zv=NULL;
-	zval *c_zv=NULL;
+	zval *item_zv, *c_zv;
 	
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &item_zv) == FAILURE) {
 		return;
@@ -242,7 +238,6 @@ PHP_METHOD(CList, insertAt){
 		d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
 		c_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_c"), 0 TSRMLS_CC);
 		if (index == Z_LVAL_P(c_zv)) {
-			php_printf("$index===$this->_c\n");
 			YII_ADD_ARRAY(d_zv, index, item_zv);
 			zend_update_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), d_zv TSRMLS_CC);
 
@@ -452,7 +447,7 @@ PHP_METHOD(CList, copyFrom){
 		if (Z_OBJ_HT_P(data_zv)->get_class_entry && instanceof_function(Z_OBJCE_P(data_zv), YII_CLASS_ENTRY(clist) TSRMLS_CC)) {
 			//zend_ce_arrayaccess foreach
 			zval *data;
-			yii_call_class_method_0(data_zv, "toArray()", &data);
+			yii_call_class_method_0(data_zv, "toArray", &data);
 			if (Z_TYPE_P(data) == IS_ARRAY) {
 				int count, i;
 				zval **z_item;
@@ -517,7 +512,7 @@ PHP_METHOD(CList, mergeWith){
 		if (Z_OBJ_HT_P(data_zv)->get_class_entry && instanceof_function(Z_OBJCE_P(data_zv), YII_CLASS_ENTRY(clist) TSRMLS_CC)) {
 			//zend_ce_arrayaccess foreach
 			zval *data;
-			yii_call_class_method_0(data_zv, "toArray()", &data);
+			yii_call_class_method_0(data_zv, "toArray", &data);
 			if (Z_TYPE_P(data) == IS_ARRAY) {
 				int count, i;
 				zval **z_item;
