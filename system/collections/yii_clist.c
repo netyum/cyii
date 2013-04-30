@@ -431,7 +431,7 @@ PHP_METHOD(CList, copyFrom){
 		return;
 	}
 
-	if ( Z_TYPE_P(data_zv) != IS_ARRAY && Z_TYPE_P(data_zv) != IS_OBJECT ) {
+	if ( Z_TYPE_P(data_zv) != IS_ARRAY && Z_TYPE_P(data_zv) != IS_OBJECT && Z_TYPE_P(data_zv)!=IS_NULL) {
 		php_printf("yii','List data must be an array or an object implementing Traversable.'\n");
 		return;
 	}
@@ -487,9 +487,6 @@ PHP_METHOD(CList, copyFrom){
 	    }
 	}
 
-	if (Z_TYPE_P(data_zv)!=IS_NULL) {
-		php_printf("'List data must be an array or an object implementing Traversable in copyFrom\n");
-	}
 }
 /* }}} */
 

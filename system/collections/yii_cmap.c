@@ -164,9 +164,11 @@ PHP_METHOD(CMap, count){
 /** {{{ public CMap::getCount()
 */
 PHP_METHOD(CMap, getCount){
-	zval *c_zv;
-	c_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_c"), 0 TSRMLS_CC);
-	RETVAL_LONG(Z_LVAL_P(c_zv));
+	zval *d_zv;
+	int d_zv_count;
+	d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
+	d_zv_count = zend_hash_num_elements(Z_ARRVAL_P(d_zv));
+	RETVAL_LONG(d_zv_count);
 	return;
 }
 /* }}} */
@@ -237,7 +239,7 @@ PHP_METHOD(CMap, itemAt){
 */
 PHP_METHOD(CMap, add){
 	zval *key_zv;
-	zval *value_zv, *d_zv, *r_zv;
+	zval *value_zv, *copy_value_zv, *d_zv, *r_zv;
 	
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz", &key_zv, &value_zv) == FAILURE) {
 		return;
@@ -295,6 +297,7 @@ PHP_METHOD(CMap, add){
 					add_assoc_zval(d_zv, Z_STRVAL_P(key_zv), value_zv);
 			}
 		}
+		//zend_update_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), d_zv TSRMLS_CC);
 		
 	}
 	else {
@@ -422,6 +425,102 @@ PHP_METHOD(CMap, toArray){
 /** {{{ public CMap::copyFrom()
 */
 PHP_METHOD(CMap, copyFrom){
+	zval *data_zv, *d_zv;
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &data_zv) == FAILURE) {
+		return;
+	}
+
+	if ( Z_TYPE_P(data_zv) != IS_ARRAY && Z_TYPE_P(data_zv) != IS_OBJECT && Z_TYPE_P(data_zv)!=IS_NULL) {
+		php_printf("yii','List data must be an array or an object implementing Traversable.'\n");
+		return;
+	}
+
+	d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
+	int d_zv_count;
+	d_zv_count = zend_hash_num_elements(Z_ARRVAL_P(d_zv));
+	if ( d_zv_count > 0 ) {
+		if (yii_call_class_method_0_no(getThis(), "clear") != SUCCESS) {
+			return;
+		}
+	}
+
+	if (Z_TYPE_P(data_zv) == IS_OBJECT && Z_OBJ_HT_P(data_zv)->get_class_entry && instanceof_function(Z_OBJCE_P(data_zv), zend_ce_traversable TSRMLS_CC)) {
+
+		if (Z_OBJ_HT_P(data_zv)->get_class_entry && instanceof_function(Z_OBJCE_P(data_zv), YII_CLASS_ENTRY(cmap) TSRMLS_CC)) {
+			//zend_ce_arrayaccess foreach
+			zval *data;
+			yii_call_class_method_0(data_zv, "toArray", &data);
+			if (Z_TYPE_P(data) == IS_ARRAY) {
+				int count, i;
+				zval **z_item;
+				// 获取数组大小
+			    count = zend_hash_num_elements(Z_ARRVAL_P(data));
+			    // 将数组的内部指针指向第一个单元
+			    zend_hash_internal_pointer_reset(Z_ARRVAL_P(data));
+			    for (i = 0; i < count; i ++) {
+					char *key; int idx;
+					zval *key_zv, *idx_zv, *item_zv;
+			        // 获取当前数据
+			        zend_hash_get_current_data(Z_ARRVAL_P(data), (void**) &z_item);
+					MAKE_STD_ZVAL(item_zv);
+					ZVAL_ZVAL(item_zv, *z_item, 1, 0);
+					if (zend_hash_get_current_key(Z_ARRVAL_P(data), &key, (unsigned long *)&idx, 0) == HASH_KEY_IS_STRING) {
+						YII_NEW_STRING(key_zv, key);
+						if (yii_call_class_method_2_no(getThis(), "add", key_zv, item_zv) != SUCCESS) {
+							return;
+						}
+						YII_PTR_DTOR(key_zv);
+					}
+					else {
+						YII_NEW_LONG(idx_zv, idx);
+						if (yii_call_class_method_2_no(getThis(), "add", idx_zv, item_zv) != SUCCESS) {
+							return;
+						}
+						YII_PTR_DTOR(idx_zv);
+					}
+			        // 将数组中的内部指针向前移动一位
+			        zend_hash_move_forward(Z_ARRVAL_P(data));
+			    }
+			}
+			YII_PTR_DTOR(data);
+		}
+	}
+
+	if (Z_TYPE_P(data_zv) == IS_ARRAY) {
+		int count, i;
+		zval **z_item;
+		// 获取数组大小
+	    count = zend_hash_num_elements(Z_ARRVAL_P(data_zv));
+	    // 将数组的内部指针指向第一个单元
+	    zend_hash_internal_pointer_reset(Z_ARRVAL_P(data_zv));
+	    for (i = 0; i < count; i ++) {
+			char *key; int idx;
+			zval *key_zv, *idx_zv, *item_zv;
+	        // 获取当前数据
+	        zend_hash_get_current_data(Z_ARRVAL_P(data_zv), (void**) &z_item);
+			MAKE_STD_ZVAL(item_zv);
+			ZVAL_ZVAL(item_zv, *z_item, 1, 0);
+			
+			if (zend_hash_get_current_key(Z_ARRVAL_P(data_zv), &key, (unsigned long *)&idx, 0) == HASH_KEY_IS_STRING) {
+				YII_NEW_STRING(key_zv, key);
+				if (yii_call_class_method_2_no(getThis(), "add", key_zv, item_zv) != SUCCESS) {
+					return;
+				}
+				YII_PTR_DTOR(key_zv);
+			}
+			else {
+				YII_NEW_LONG(idx_zv, idx);
+				if (yii_call_class_method_2_no(getThis(), "add", idx_zv, *z_item) != SUCCESS) {
+					return;
+				}
+				YII_PTR_DTOR(idx_zv);
+			}
+	        // 将数组中的内部指针向前移动一位
+	        zend_hash_move_forward(Z_ARRVAL_P(data_zv));
+	    }
+	}
+	
+	d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
 
 }
 /* }}} */
@@ -451,8 +550,6 @@ PHP_METHOD(CMap, mergeWith){
 			if (Z_TYPE_P(data) == IS_ARRAY) {
 				if (recursive == 1) {
 					zval *retval;
-					php_var_dump(&d_zv, 1);
-					php_var_dump(&data, 1);
 					if (yii_call_class_static_method_2(getThis(), "self", "mergeArray", &retval, d_zv, data)==SUCCESS) {
 						zend_update_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), retval TSRMLS_CC);
 					}
@@ -466,19 +563,21 @@ PHP_METHOD(CMap, mergeWith){
 					zend_hash_internal_pointer_reset(Z_ARRVAL_P(data));
 					for (i = 0; i < count; i ++) {
 						char *key; int idx;
-						zval *key_zv, *idx_zv;
+						zval *key_zv, *idx_zv, *item_zv; 
 						// 获取当前数据
 						zend_hash_get_current_data(Z_ARRVAL_P(data), (void**) &z_item);
+						MAKE_STD_ZVAL(item_zv);
+						ZVAL_ZVAL(item_zv, *z_item, 1, 0);
 						if (zend_hash_get_current_key(Z_ARRVAL_P(data), &key, (unsigned long *)&idx, 0) == HASH_KEY_IS_STRING) {
 							YII_NEW_STRING(key_zv, key);
-							if (yii_call_class_method_2_no(getThis(), "add", key_zv, *z_item) != SUCCESS) {
+							if (yii_call_class_method_2_no(getThis(), "add", key_zv, item_zv) != SUCCESS) {
 								return;
 							}
 							YII_PTR_DTOR(key_zv);
 						}
 						else {
 							YII_NEW_LONG(idx_zv, idx);
-							if (yii_call_class_method_2_no(getThis(), "add", idx_zv, *z_item) != SUCCESS) {
+							if (yii_call_class_method_2_no(getThis(), "add", idx_zv, item_zv) != SUCCESS) {
 								return;
 							}
 							YII_PTR_DTOR(idx_zv);
@@ -502,19 +601,21 @@ PHP_METHOD(CMap, mergeWith){
 	    zend_hash_internal_pointer_reset(Z_ARRVAL_P(data_zv));
 	    for (i = 0; i < count; i ++) {
 			char *key; int idx;
-			zval *key_zv, *idx_zv;
+			zval *key_zv, *idx_zv, *item_zv;
 	        // 获取当前数据
 	        zend_hash_get_current_data(Z_ARRVAL_P(data_zv), (void**) &z_item);
+			MAKE_STD_ZVAL(item_zv);
+			ZVAL_ZVAL(item_zv, *z_item, 1, 0);
 			if (zend_hash_get_current_key(Z_ARRVAL_P(data_zv), &key, (unsigned long *)&idx, 0) == HASH_KEY_IS_STRING) {
 				YII_NEW_STRING(key_zv, key);
-				if (yii_call_class_method_2_no(getThis(), "add", key_zv, *z_item) != SUCCESS) {
+				if (yii_call_class_method_2_no(getThis(), "add", key_zv, item_zv) != SUCCESS) {
 					return;
 				}
 				YII_PTR_DTOR(key_zv);
 			}
 			else {
 				YII_NEW_LONG(idx_zv, idx);
-				if (yii_call_class_method_2_no(getThis(), "add", idx_zv, *z_item) != SUCCESS) {
+				if (yii_call_class_method_2_no(getThis(), "add", idx_zv, item_zv) != SUCCESS) {
 					return;
 				}
 				YII_PTR_DTOR(idx_zv);
