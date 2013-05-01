@@ -61,8 +61,7 @@ PHP_METHOD(CQueue, __construct){
 			return;
 		}
 	}
-	
-	YII_PTR_DTOR(data_zv);
+
 }
 /* }}} */
 
@@ -228,7 +227,7 @@ PHP_METHOD(CQueue, dequeue){
 		php_printf("'The queue is empty.'\n");
 	}
 	else {
-		zend_update_property_long(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), Z_LVAL_P(c_zv)-1 TSRMLS_CC);
+		zend_update_property_long(Z_OBJCE_P(getThis()), getThis(), YII_SL("_c"), Z_LVAL_P(c_zv)-1 TSRMLS_CC);
 		d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
 		if (yii_call_user_fun_1("array_shift", &item_zv, d_zv) == SUCCESS) {
 			RETVAL_ZVAL(item_zv, 1, 0);
@@ -248,7 +247,7 @@ PHP_METHOD(CQueue, enqueue){
 	}
 	
 	c_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_c"), 0 TSRMLS_CC);
-	zend_update_property_long(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), Z_LVAL_P(c_zv)+1 TSRMLS_CC);
+	zend_update_property_long(Z_OBJCE_P(getThis()), getThis(), YII_SL("_c"), Z_LVAL_P(c_zv)+1 TSRMLS_CC);
 	
 	d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
 	YII_ADD_NEXT_ARRAY(d_zv, item_zv);

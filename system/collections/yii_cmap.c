@@ -81,7 +81,7 @@ ZEND_END_ARG_INFO()
 /** {{{ public CMap::__construct()
 */
 PHP_METHOD(CMap, __construct){
-	zval *data_zv=NULL, *readOnly_zv=NULL, *d_zv;
+	zval *data_zv=NULL, *d_zv;
 	int *readOnly=0;
 	
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|zb", &data_zv, &readOnly) == FAILURE) {

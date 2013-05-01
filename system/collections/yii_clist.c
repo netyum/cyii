@@ -86,7 +86,7 @@ ZEND_END_ARG_INFO()
 /** {{{ public CList::__construct()
 */
 PHP_METHOD(CList, __construct){
-	zval *data_zv=NULL, *readOnly_zv=NULL, *d_zv;
+	zval *data_zv=NULL, *d_zv;
 	int *readOnly=0;
 	
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|zb", &data_zv, &readOnly) == FAILURE) {
@@ -102,7 +102,6 @@ PHP_METHOD(CList, __construct){
 	}
 
 
-	YII_NEW_BOOL(readOnly_zv, readOnly);
 	if (!data_zv) {
 		YII_NEW_NULL(data_zv);
 	}
@@ -112,10 +111,7 @@ PHP_METHOD(CList, __construct){
 			return;
 		}
 	}
-	
-	YII_PTR_DTOR(data_zv);
-	YII_PTR_DTOR(readOnly_zv);
-	
+
 }
 /* }}} */
 
