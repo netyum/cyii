@@ -1,3 +1,3 @@
-YII_CLASS_DECLARE_ENTRY_EX(clistiterator);
+YII_CLASS_DECLARE_ENTRY_EX(cstack);
 
-YII_CLASS_FUNCTION(clistiterator);
+YII_CLASS_FUNCTION(cstack);

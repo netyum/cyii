@@ -82,8 +82,7 @@ ZEND_END_ARG_INFO()
 */
 PHP_METHOD(CMap, __construct){
 	zval *data_zv=NULL, *d_zv;
-	int *readOnly=0;
-	
+	int *readOnly=0, init_flag = 0;
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|zb", &data_zv, &readOnly) == FAILURE) {
 		return;
 	}
@@ -98,6 +97,7 @@ PHP_METHOD(CMap, __construct){
 
 
 	if (!data_zv) {
+		init_flag = 1;
 		YII_NEW_NULL(data_zv);
 	}
 
@@ -106,7 +106,10 @@ PHP_METHOD(CMap, __construct){
 			return;
 		}
 	}
-	
+
+	if (init_flag==1) {
+		YII_PTR_DTOR(data_zv);
+	}
 }
 /* }}} */
 

@@ -39,6 +39,7 @@ ZEND_END_ARG_INFO()
 */
 PHP_METHOD(CQueue, __construct){
 	zval *data_zv=NULL, *d_zv;
+	int init_flag = 0;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|z", &data_zv) == FAILURE) {
 		return;
@@ -53,6 +54,7 @@ PHP_METHOD(CQueue, __construct){
 	}
 
 	if (!data_zv) {
+		init_flag = 1;
 		YII_NEW_NULL(data_zv);
 	}
 
@@ -60,6 +62,10 @@ PHP_METHOD(CQueue, __construct){
 		if (yii_call_class_method_1_no(getThis(), "copyFrom", data_zv) != SUCCESS) {
 			return;
 		}
+	}
+	
+	if (init_flag==1) {
+		YII_PTR_DTOR(data_zv);
 	}
 
 }
