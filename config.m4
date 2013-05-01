@@ -31,6 +31,7 @@ if test "$PHP_YII" = "yes"; then
 	system/collections/yii_cstackiterator.c \
 	system/collections/yii_cmap.c \
 	system/collections/yii_cmapiterator.c \
+	system/collections/yii_cqueue.c \
 	system/collections/yii_cqueueiterator.c \
 	\
 	system/yii_yiibase.c,            

@@ -19,7 +19,7 @@ YII_CLASS_DECLARE_ENTRY(cmap);
 /** {{{ ARG_INFO
 */
 ZEND_BEGIN_ARG_INFO_EX(arginfo_cmap___construct, 0, 0, 0)
-	ZEND_ARG_ARRAY_INFO(0, data, 0)
+	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, readOnly)
 ZEND_END_ARG_INFO()
 
@@ -249,7 +249,7 @@ PHP_METHOD(CMap, add){
 
 	if (Z_BVAL_P(r_zv) == 0) {
 		d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
-		if (Z_TYPE_P(key_zv) == IS_NULL) {
+		if (Z_TYPE_P(key_zv) == IS_NULL || Z_TYPE_P(key_zv) == IS_LONG) {
 			switch(Z_TYPE_P(value_zv)) {
 				case IS_LONG:
 					add_next_index_long(d_zv, Z_LVAL_P(value_zv));
@@ -297,7 +297,7 @@ PHP_METHOD(CMap, add){
 					add_assoc_zval(d_zv, Z_STRVAL_P(key_zv), value_zv);
 			}
 		}
-		//zend_update_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), d_zv TSRMLS_CC);
+		zend_update_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), d_zv TSRMLS_CC);
 		
 	}
 	else {
@@ -431,7 +431,11 @@ PHP_METHOD(CMap, copyFrom){
 	}
 
 	if ( Z_TYPE_P(data_zv) != IS_ARRAY && Z_TYPE_P(data_zv) != IS_OBJECT && Z_TYPE_P(data_zv)!=IS_NULL) {
-		php_printf("yii','List data must be an array or an object implementing Traversable.'\n");
+		php_printf("yii','Map data must be an array or an object implementing Traversable.'\n");
+		return;
+	}
+	else if (Z_TYPE_P(data_zv) == IS_OBJECT && Z_OBJ_HT_P(data_zv)->get_class_entry && !instanceof_function(Z_OBJCE_P(data_zv), zend_ce_traversable TSRMLS_CC)) {
+		php_printf("yii','Map data must be an array or an object implementing Traversable.'\n");
 		return;
 	}
 
@@ -462,7 +466,7 @@ PHP_METHOD(CMap, copyFrom){
 					zval *key_zv, *idx_zv, *item_zv;
 			        // 获取当前数据
 			        zend_hash_get_current_data(Z_ARRVAL_P(data), (void**) &z_item);
-					MAKE_STD_ZVAL(item_zv);
+					ALLOC_INIT_ZVAL(item_zv);
 					ZVAL_ZVAL(item_zv, *z_item, 1, 0);
 					if (zend_hash_get_current_key(Z_ARRVAL_P(data), &key, (unsigned long *)&idx, 0) == HASH_KEY_IS_STRING) {
 						YII_NEW_STRING(key_zv, key);
@@ -478,6 +482,10 @@ PHP_METHOD(CMap, copyFrom){
 						}
 						YII_PTR_DTOR(idx_zv);
 					}
+					
+					if (Z_TYPE_P(item_zv) != IS_ARRAY && Z_TYPE_P(item_zv) != IS_OBJECT) {
+						YII_PTR_DTOR(item_zv);
+					}
 			        // 将数组中的内部指针向前移动一位
 			        zend_hash_move_forward(Z_ARRVAL_P(data));
 			    }
@@ -485,7 +493,7 @@ PHP_METHOD(CMap, copyFrom){
 			YII_PTR_DTOR(data);
 		}
 	}
-
+	
 	if (Z_TYPE_P(data_zv) == IS_ARRAY) {
 		int count, i;
 		zval **z_item;
@@ -498,30 +506,38 @@ PHP_METHOD(CMap, copyFrom){
 			zval *key_zv, *idx_zv, *item_zv;
 	        // 获取当前数据
 	        zend_hash_get_current_data(Z_ARRVAL_P(data_zv), (void**) &z_item);
-			MAKE_STD_ZVAL(item_zv);
+	
+			ALLOC_INIT_ZVAL(item_zv);
 			ZVAL_ZVAL(item_zv, *z_item, 1, 0);
-			
+
 			if (zend_hash_get_current_key(Z_ARRVAL_P(data_zv), &key, (unsigned long *)&idx, 0) == HASH_KEY_IS_STRING) {
 				YII_NEW_STRING(key_zv, key);
 				if (yii_call_class_method_2_no(getThis(), "add", key_zv, item_zv) != SUCCESS) {
 					return;
 				}
 				YII_PTR_DTOR(key_zv);
+				
 			}
 			else {
 				YII_NEW_LONG(idx_zv, idx);
-				if (yii_call_class_method_2_no(getThis(), "add", idx_zv, *z_item) != SUCCESS) {
+				if (yii_call_class_method_2_no(getThis(), "add", idx_zv, item_zv) != SUCCESS) {
+					php_printf("error\n");
 					return;
 				}
 				YII_PTR_DTOR(idx_zv);
 			}
+			
+			if (Z_TYPE_P(item_zv) != IS_ARRAY && Z_TYPE_P(item_zv) != IS_OBJECT) {
+				YII_PTR_DTOR(item_zv);
+			}
+			
 	        // 将数组中的内部指针向前移动一位
 	        zend_hash_move_forward(Z_ARRVAL_P(data_zv));
 	    }
+		
 	}
-	
 	d_zv = zend_read_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), 0 TSRMLS_CC);
-
+	
 }
 /* }}} */
 

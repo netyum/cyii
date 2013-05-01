@@ -18,7 +18,7 @@ YII_CLASS_DECLARE_ENTRY(clist);
 /** {{{ ARG_INFO
 */
 ZEND_BEGIN_ARG_INFO_EX(arginfo_clist___construct, 0, 0, 0)
-	ZEND_ARG_ARRAY_INFO(0, data, 0)
+	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, readOnly)
 ZEND_END_ARG_INFO()
 
@@ -432,6 +432,10 @@ PHP_METHOD(CList, copyFrom){
 	}
 
 	if ( Z_TYPE_P(data_zv) != IS_ARRAY && Z_TYPE_P(data_zv) != IS_OBJECT && Z_TYPE_P(data_zv)!=IS_NULL) {
+		php_printf("yii','List data must be an array or an object implementing Traversable.'\n");
+		return;
+	}
+	else if (Z_TYPE_P(data_zv) == IS_OBJECT && Z_OBJ_HT_P(data_zv)->get_class_entry && !instanceof_function(Z_OBJCE_P(data_zv), zend_ce_traversable TSRMLS_CC)) {
 		php_printf("yii','List data must be an array or an object implementing Traversable.'\n");
 		return;
 	}
