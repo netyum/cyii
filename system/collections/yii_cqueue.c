@@ -106,7 +106,7 @@ PHP_METHOD(CQueue, copyFrom){
 		yii_call_class_method_0(data_zv, "toArray", &data);
 		if (Z_TYPE_P(data) == IS_ARRAY) {
 			int count, i;
-			zval **z_item;
+			zval **z_item, *item_zv;
 			// 获取数组大小
 		    count = zend_hash_num_elements(Z_ARRVAL_P(data));
 		    // 将数组的内部指针指向第一个单元
@@ -114,8 +114,16 @@ PHP_METHOD(CQueue, copyFrom){
 		    for (i = 0; i < count; i ++) {
 		        // 获取当前数据
 		        zend_hash_get_current_data(Z_ARRVAL_P(data), (void**) &z_item);
-				YII_ADD_NEXT_ARRAY(d_zv, *z_item);
+				ALLOC_INIT_ZVAL(item_zv);
+				ZVAL_ZVAL(item_zv, *z_item, 1, 0);
+				
+				YII_ADD_NEXT_ARRAY(d_zv, item_zv);
 				Z_LVAL_P(c_zv)++;
+				
+				if (Z_TYPE_P(item_zv) != IS_ARRAY && Z_TYPE_P(item_zv) != IS_OBJECT) {
+					YII_PTR_DTOR(item_zv);
+				}
+				
 		        // 将数组中的内部指针向前移动一位
 		        zend_hash_move_forward(Z_ARRVAL_P(data));
 		    }
@@ -126,7 +134,7 @@ PHP_METHOD(CQueue, copyFrom){
 
 	if (Z_TYPE_P(data_zv) == IS_ARRAY) {
 		int count, i;
-		zval **z_item;
+		zval **z_item, *item_zv;
 		// 获取数组大小
 	    count = zend_hash_num_elements(Z_ARRVAL_P(data_zv));
 	    // 将数组的内部指针指向第一个单元
@@ -134,15 +142,22 @@ PHP_METHOD(CQueue, copyFrom){
 	    for (i = 0; i < count; i ++) {
 	        // 获取当前数据
 	        zend_hash_get_current_data(Z_ARRVAL_P(data_zv), (void**) &z_item);
-			YII_ADD_NEXT_ARRAY(d_zv, *z_item);
+	
+			ALLOC_INIT_ZVAL(item_zv);
+			ZVAL_ZVAL(item_zv, *z_item, 1, 0);
+
+			YII_ADD_NEXT_ARRAY(d_zv, item_zv);
 			Z_LVAL_P(c_zv)++;
 			
+			if (Z_TYPE_P(item_zv) != IS_ARRAY && Z_TYPE_P(item_zv) != IS_OBJECT) {
+				YII_PTR_DTOR(item_zv);
+			}
 	        // 将数组中的内部指针向前移动一位
 	        zend_hash_move_forward(Z_ARRVAL_P(data_zv));
 	    }
 	}
 
-	zend_update_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), d_zv TSRMLS_CC);
+	//zend_update_property(Z_OBJCE_P(getThis()), getThis(), YII_SL("_d"), d_zv TSRMLS_CC);
 	zend_update_property_long(Z_OBJCE_P(getThis()), getThis(), YII_SL("_c"), Z_LVAL_P(c_zv) TSRMLS_CC);
 }
 /* }}} */

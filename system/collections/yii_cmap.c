@@ -97,7 +97,6 @@ PHP_METHOD(CMap, __construct){
 	}
 
 
-	YII_NEW_BOOL(readOnly_zv, readOnly);
 	if (!data_zv) {
 		YII_NEW_NULL(data_zv);
 	}
@@ -108,8 +107,6 @@ PHP_METHOD(CMap, __construct){
 		}
 	}
 	
-	YII_PTR_DTOR(data_zv);
-	YII_PTR_DTOR(readOnly_zv);
 }
 /* }}} */
 
